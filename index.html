@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MONEY CHANGER | Construimos Imperios. Tú solo creas.</title>
+    <meta name="description" content="Tu infraestructura de negocios llave en mano. Lista para facturar en 7 días. La evolución del e-commerce premium.">
+    
+    <!-- Fonts: Bebas Neue (Impacto), Syne (Moderno), DM Mono (Tech), Outfit (Clean) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;600;800&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind V4 CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- GSAP & ScrollTrigger -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --black: #0A0A0A;
+            --neon-green: #00FF9D;
+            --neon-cyan: #00F0FF;
+            --chrome-gradient: linear-gradient(180deg, #FFFFFF 0%, #A1A1A1 50%, #FFFFFF 100%);
+        }
+
+        body {
+            background-color: var(--black);
+            color: white;
+            font-family: 'Syne', sans-serif;
+            overflow-x: hidden;
+            cursor: none;
+        }
+
+        /* Noise Overlay - Textura Premium */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: url("https://grainy-gradients.vercel.app/noise.svg");
+            opacity: 0.04;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .font-display { font-family: 'Bebas Neue', cursive; }
+        .font-tech { font-family: 'DM Mono', monospace; }
+        .font-clean { font-family: 'Outfit', sans-serif; }
+
+        /* Chrome Text */
+        .chrome-text {
+            background: var(--chrome-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.2));
+        }
+
+        .neon-glow { text-shadow: 0 0 15px var(--neon-green); }
+
+        /* Liquid Glass */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .glass-card:hover {
+            border-color: var(--neon-green);
+            background: rgba(0, 255, 157, 0.03);
+            transform: translateY(-5px);
+        }
+
+        /* Custom Cursor */
+        #cursor {
+            position: fixed; top: 0; left: 0; width: 32px; height: 32px;
+            border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 50%;
+            pointer-events: none; z-index: 9999; transition: transform 0.1s;
+        }
+        #cursor-dot {
+            position: fixed; top: 0; left: 0; width: 6px; height: 6px;
+            background: var(--neon-green); border-radius: 50%;
+            pointer-events: none; z-index: 10000;
+        }
+
+        /* Ticker Animation */
+        @keyframes ticker {
+            from { transform: translateX(0); }
+            to { transform: translateX(-50%); }
+        }
+        .ticker-track { animation: ticker 25s linear infinite; }
+
+        /* Scrollbar Custom */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: var(--black); }
+        ::-webkit-scrollbar-thumb { background: var(--neon-green); border-radius: 10px; }
+
+        /* Plan Toggle active */
+        .path-btn.active {
+            background: rgba(0, 255, 157, 0.1);
+            border-color: var(--neon-green);
+            color: var(--neon-green);
+            box-shadow: 0 0 20px rgba(0, 255, 157, 0.2);
+        }
+
+        /* Product Shine Effect */
+        .product-card::after {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%; width: 200%; height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.05), transparent);
+            transform: rotate(45deg);
+            transition: 0.8s;
+        }
+        .product-card:hover::after { left: 120%; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Preloader -->
+    <div id="preloader" class="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center transition-opacity duration-1000">
+        <h1 class="text-5xl font-display chrome-text tracking-widest opacity-0" id="loaderLogo">MONEY CHANGER</h1>
+        <div class="w-64 h-[1px] bg-white/10 mt-8 rounded-full overflow-hidden">
+            <div id="loaderBar" class="w-0 h-full bg-neon-green shadow-[0_0_15px_#00FF9D]"></div>
+        </div>
+    </div>
+
+    <!-- Custom Cursor -->
+    <div id="cursor" class="hidden md:block"></div>
+    <div id="cursor-dot" class="hidden md:block"></div>
+
+    <!-- Navbar -->
+    <nav class="fixed top-0 w-full z-50 px-6 py-8 opacity-0" id="mainNav">
+        <div class="max-w-7xl mx-auto flex justify-between items-center glass-card px-8 py-4 rounded-full border-white/5">
+            <a href="#" class="text-2xl font-display tracking-widest chrome-text">
+                MONEY CHANGER
+            </a>
+            <div class="hidden md:flex gap-10 font-tech text-[10px] tracking-[0.3em] text-white/40 uppercase">
+                <a href="#proposito" class="hover:text-neon-green transition-colors">Propósito</a>
+                <a href="#merch" class="hover:text-neon-green transition-colors">Test Merch</a>
+                <a href="#planes" class="hover:text-neon-cyan transition-colors">Planes</a>
+                <a href="#dashboard" class="hover:text-neon-cyan transition-colors">Dashboard</a>
+            </div>
+            <a href="#planes" class="px-6 py-2 rounded-full glass-card border-neon-green/30 text-[10px] font-bold tracking-widest text-neon-green hover:bg-neon-green hover:text-black transition-all">
+                DESPLEGAR
+            </a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <main class="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden" id="hero">
+        <div class="absolute inset-0 z-0">
+            <video autoplay muted loop playsinline class="w-full h-full object-cover opacity-20 grayscale contrast-125 scale-110" id="heroVideo">
+                <source src="https://i.imgur.com/ScKNVsq.mp4" type="video/mp4">
+            </video>
+            <div class="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black"></div>
+        </div>
+
+        <div class="relative z-10 text-center px-4 max-w-6xl">
+            <div class="inline-block px-4 py-1 mb-8 rounded-full glass-card border-neon-green/30 text-neon-green font-tech text-[9px] tracking-[0.5em] uppercase">
+                SISTEMA OPERATIVO DE NEGOCIOS &bull; INFRAESTRUCTURA BOTTLE CODE
+            </div>
+            <h1 class="text-[85px] md:text-[180px] font-display leading-[0.8] tracking-tighter chrome-text mb-8" id="mainTitle">
+                MONEY <br class="md:hidden"> CHANGER
+            </h1>
+            <p class="text-xl md:text-3xl font-light text-white/80 mb-6 tracking-wide font-clean uppercase">
+                Construimos Imperios. <span class="text-neon-green font-bold neon-glow">Tú solo creas.</span>
+            </p>
+            <p class="text-sm md:text-lg text-white/40 mb-12 max-w-2xl mx-auto leading-relaxed font-clean">
+                Tu infraestructura global lista en <span class="text-white font-bold">7 días</span>. <br>
+                Producción automática, logística delegada y control total desde tu Pixel.
+            </p>
+            
+            <div class="flex flex-col md:flex-row gap-6 justify-center items-center" id="heroActions">
+                <a href="#planes" class="px-12 py-5 rounded-sm bg-white text-black font-display text-2xl tracking-tighter hover:scale-105 transition-transform">
+                    ⚡ DESPLEGAR MI TIENDA AHORA
+                </a>
+                <a href="#merch" class="px-10 py-5 rounded-sm glass-card border-white/10 font-display text-2xl tracking-tighter text-white hover:bg-white/5 transition-all">
+                    TESTEAR CALIDAD →
+                </a>
+            </div>
+        </div>
+
+        <!-- Parallax Background Letters -->
+        <div class="absolute bottom-10 left-10 hidden lg:block opacity-10 floating-letter">
+            <div class="text-[20rem] font-display chrome-text leading-none select-none">M</div>
+        </div>
+        <div class="absolute top-1/4 right-0 hidden lg:block opacity-10 floating-letter">
+            <div class="text-[18rem] font-display chrome-text leading-none select-none blur-sm">C</div>
+        </div>
+    </main>
+
+    <!-- Ticker -->
+    <div class="py-6 border-y border-white/5 bg-black/50 overflow-hidden relative z-20">
+        <div class="ticker-track flex whitespace-nowrap">
+            <span class="mx-12 font-display text-3xl text-gray-700 tracking-widest flex items-center gap-6">
+                <div class="w-3 h-3 bg-neon-green rounded-full"></div> INFRAESTRUCTURA DE ÉLITE
+            </span>
+            <span class="mx-12 font-display text-3xl text-gray-700 tracking-widest flex items-center gap-6">
+                <div class="w-3 h-3 bg-neon-cyan rounded-full"></div> PANEL DE PROVEEDOR EXCLUSIVO
+            </span>
+            <span class="mx-12 font-display text-3xl text-gray-700 tracking-widest flex items-center gap-6">
+                <div class="w-3 h-3 bg-neon-green rounded-full"></div> ROPA + CURSOS + DIGITALES
+            </span>
+            <span class="mx-12 font-display text-3xl text-gray-700 tracking-widest flex items-center gap-6">
+                <div class="w-3 h-3 bg-neon-cyan rounded-full"></div> ESCALA SIN LÍMITES
+            </span>
+            <!-- Repetir para Loop -->
+            <span class="mx-12 font-display text-3xl text-gray-700 tracking-widest flex items-center gap-6">
+                <div class="w-3 h-3 bg-neon-green rounded-full"></div> INFRAESTRUCTURA DE ÉLITE
+            </span>
+            <span class="mx-12 font-display text-3xl text-gray-700 tracking-widest flex items-center gap-6">
+                <div class="w-3 h-3 bg-neon-cyan rounded-full"></div> PANEL DE PROVEEDOR EXCLUSIVO
+            </span>
+        </div>
+    </div>
+
+    <!-- Proposition Section -->
+    <section id="proposito" class="py-40 px-6 relative">
+        <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-24 items-center">
+            <div class="reveal-content">
+                <div class="flex items-center gap-4 mb-8">
+                    <div class="h-[1px] w-12 bg-neon-green"></div>
+                    <span class="font-tech text-[10px] text-neon-green tracking-[0.4em] uppercase">01 - Propósito</span>
+                </div>
+                <h3 class="text-6xl md:text-8xl font-display chrome-text mb-10 leading-[0.9]">
+                    TE DAMOS LAS <br> <span class="neon-glow text-neon-green">LLAVES DEL REINO</span>
+                </h3>
+                <p class="text-xl text-white/60 mb-10 leading-relaxed font-clean">
+                    "Tu camino hacia la libertad financiera comienza con una infraestructura que no descansa." No te vendemos un curso, te entregamos el **Panel de nuestro Proveedor Global** configurado para tu éxito.
+                </p>
+                <div class="glass-card p-10 rounded-2xl border-neon-cyan/20">
+                    <p class="text-lg text-white/90 mb-6 font-clean">
+                        Monitorea ventas e inventario en tiempo real con el 
+                        <span class="text-neon-cyan font-bold">Dashboard Premium Money Changer</span> sincronizado con la manufactura.
+                    </p>
+                    <p class="text-white/40 italic text-sm font-clean">
+                        La misma infraestructura que usa Bottle Code para escalar sus propias marcas.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="relative reveal-image">
+                <div class="absolute -inset-10 bg-neon-green/5 blur-[120px] rounded-full"></div>
+                <div class="relative glass-card border-white/10 p-2 rounded-[2.5rem] transform rotate-2 hover:rotate-0 transition-transform duration-1000 shadow-2xl">
+                    <div class="bg-black rounded-[2rem] p-8 aspect-[9/16] max-w-[320px] mx-auto flex flex-col font-tech">
+                        <div class="flex justify-between items-center mb-10 text-[9px]">
+                            <span class="text-gray-600 tracking-widest uppercase">Provider API Status</span>
+                            <div class="w-2 h-2 bg-neon-green rounded-full animate-pulse shadow-[0_0_10px_#00FF9D]"></div>
+                        </div>
+                        <div class="mb-12">
+                            <p class="text-[10px] text-gray-500 mb-2 uppercase">Manufactura Activa</p>
+                            <p class="text-4xl font-display chrome-text">$14,582</p>
+                        </div>
+                        <div class="space-y-4 flex-grow">
+                            <div class="h-16 glass-card rounded-xl flex items-center px-4 justify-between border-white/5">
+                                <i data-lucide="package" class="w-4 h-4 text-gray-500"></i>
+                                <span class="text-[10px] text-neon-green font-bold">SENT TO PRINT</span>
+                            </div>
+                            <div class="h-16 glass-card rounded-xl flex items-center px-4 justify-between border-white/5 opacity-40">
+                                <i data-lucide="truck" class="w-4 h-4 text-gray-500"></i>
+                                <span class="text-[10px] text-chrome font-bold">IN TRANSIT</span>
+                            </div>
+                        </div>
+                        <div class="mt-8 h-12 bg-neon-green rounded-xl flex items-center justify-center text-black font-bold text-[10px] tracking-widest uppercase cursor-pointer hover:bg-white transition-colors">
+                            ACCEDER AL PANEL
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section: TEST THE EMPIRE (NUEVA) -->
+    <section id="merch" class="py-40 px-6 relative bg-[#050505]">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-24 gap-8">
+                <div class="reveal-content">
+                    <div class="flex items-center gap-4 mb-8">
+                        <div class="h-[1px] w-12 bg-neon-cyan"></div>
+                        <span class="font-tech text-[10px] text-neon-cyan tracking-[0.4em] uppercase">02 - Test the quality</span>
+                    </div>
+                    <h2 class="text-7xl md:text-[100px] font-display chrome-text leading-none uppercase">TEST THE <br> <span class="text-neon-cyan">EMPIRE</span></h2>
+                </div>
+                <p class="text-white/40 max-w-sm font-clean text-right text-sm uppercase tracking-widest leading-relaxed reveal-content">
+                    No somos teóricos. Usamos la misma infraestructura que te entregamos. Compra nuestra merch oficial y testea la calidad del proveedor que operará tu negocio.
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Producto 1 -->
+                <div class="glass-card product-card p-4 rounded-[2rem] relative overflow-hidden group reveal-up">
+                    <div class="aspect-square bg-white/5 rounded-[1.5rem] mb-6 overflow-hidden flex items-center justify-center">
+                        <img src="https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=800&q=80" alt="Hoodie Premium" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-80">
+                    </div>
+                    <div class="px-4 pb-4">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-display text-2xl chrome-text tracking-widest">EMPIRE HOODIE v2</h4>
+                            <span class="text-neon-green font-tech text-xs">$899</span>
+                        </div>
+                        <p class="text-[9px] font-tech text-gray-500 uppercase tracking-widest mb-6">Heavy Cotton / Chrome Print</p>
+                        <a href="#" class="w-full h-12 glass-card border-white/10 rounded-lg flex items-center justify-center text-[10px] font-bold tracking-[0.2em] uppercase hover:bg-white hover:text-black transition-all">
+                            TESTEAR CALIDAD
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Producto 2 -->
+                <div class="glass-card product-card p-4 rounded-[2rem] relative overflow-hidden group reveal-up" style="transition-delay: 100ms;">
+                    <div class="aspect-square bg-white/5 rounded-[1.5rem] mb-6 overflow-hidden flex items-center justify-center">
+                        <img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&q=80" alt="Viral Tee" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-80">
+                    </div>
+                    <div class="px-4 pb-4">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-display text-2xl chrome-text tracking-widest">VIRAL OVERSIZED TEE</h4>
+                            <span class="text-neon-cyan font-tech text-xs">$549</span>
+                        </div>
+                        <p class="text-[9px] font-tech text-gray-500 uppercase tracking-widest mb-6">Drop Shoulder / 240 GSM</p>
+                        <a href="#" class="w-full h-12 glass-card border-white/10 rounded-lg flex items-center justify-center text-[10px] font-bold tracking-[0.2em] uppercase hover:bg-white hover:text-black transition-all">
+                            TESTEAR CALIDAD
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Producto 3 -->
+                <div class="glass-card product-card p-4 rounded-[2rem] relative overflow-hidden group reveal-up" style="transition-delay: 200ms;">
+                    <div class="aspect-square bg-white/5 rounded-[1.5rem] mb-6 overflow-hidden flex items-center justify-center">
+                        <img src="https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=800&q=80" alt="Empire Cap" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-80">
+                    </div>
+                    <div class="px-4 pb-4">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-display text-2xl chrome-text tracking-widest">CYBER FINANCE CAP</h4>
+                            <span class="text-white font-tech text-xs">$399</span>
+                        </div>
+                        <p class="text-[9px] font-tech text-gray-500 uppercase tracking-widest mb-6">Embroidery / 3D Chrome</p>
+                        <a href="#" class="w-full h-12 glass-card border-white/10 rounded-lg flex items-center justify-center text-[10px] font-bold tracking-[0.2em] uppercase hover:bg-white hover:text-black transition-all">
+                            TESTEAR CALIDAD
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3 Steps -->
+    <section id="pasos" class="py-40 bg-black relative border-y border-white/5">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-32">
+                <h2 class="text-7xl md:text-[100px] font-display chrome-text mb-6 uppercase">DE LA IDEA AL IMPERIO</h2>
+                <p class="text-white/20 font-tech text-xs tracking-[0.6em] uppercase">3 Simples Pasos de Despliegue</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="glass-card p-12 rounded-3xl border-white/5 group hover:border-neon-green/30 transition-all step-card">
+                    <div class="text-7xl font-display text-white/5 mb-10 group-hover:text-neon-green/20 transition-colors">01</div>
+                    <h4 class="text-3xl font-display mb-6 chrome-text tracking-widest">ARQUITECTURA <br> DE MARCA</h4>
+                    <p class="text-white/50 leading-relaxed font-clean text-sm uppercase">Diseñamos tu identidad visual desde cero o potenciamos tu branding actual con estándares de lujo.</p>
+                </div>
+                <div class="glass-card p-12 rounded-3xl border-white/5 group hover:border-neon-cyan/30 transition-all step-card" style="transition-delay: 100ms;">
+                    <div class="text-7xl font-display text-white/5 mb-10 group-hover:text-neon-cyan/20 transition-colors">02</div>
+                    <h4 class="text-3xl font-display mb-6 chrome-text tracking-widest text-neon-cyan">PANEL DEL <br> PROVEEDOR</h4>
+                    <p class="text-white/50 leading-relaxed font-clean text-sm uppercase">Integramos tu Dashboard con la API del socio de manufactura. Sube diseños y automatiza la producción global.</p>
+                </div>
+                <div class="glass-card p-12 rounded-3xl border-white/5 group hover:border-white/30 transition-all step-card" style="transition-delay: 200ms;">
+                    <div class="text-7xl font-display text-white/5 mb-10 group-hover:text-white/20 transition-colors">03</div>
+                    <h4 class="text-3xl font-display mb-6 chrome-text tracking-widest">ESCALA Y <br> DIVERSIFICA</h4>
+                    <p class="text-white/50 leading-relaxed font-clean text-sm uppercase">Vende ropa, cursos y productos digitales. Tu imperio no tiene fronteras con nuestra infraestructura delegada.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Plans -->
+    <section id="planes" class="py-40 px-6 bg-black relative">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-24">
+                <h2 class="text-7xl md:text-[120px] font-display chrome-text mb-12 tracking-tighter uppercase leading-none">NIVELES DE <br> DESPLIEGUE</h2>
+                
+                <!-- Toggle Path -->
+                <div class="flex justify-center mb-20">
+                    <div class="glass-card p-2 rounded-full flex gap-2 border-white/10">
+                        <button onclick="switchPath('A')" id="btnA" class="path-btn active px-10 py-4 rounded-full font-tech text-[10px] tracking-widest font-bold transition-all uppercase">
+                            Ya tengo marca propia
+                        </button>
+                        <button onclick="switchPath('B')" id="btnB" class="path-btn px-10 py-4 rounded-full font-tech text-[10px] tracking-widest font-bold transition-all uppercase text-white/30">
+                            Quiero branding desde cero
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PATH A -->
+            <div id="pathA" class="grid lg:grid-cols-3 gap-8">
+                <!-- CORE -->
+                <div class="glass-card p-12 rounded-[2rem] border-white/5 plan-card">
+                    <div class="font-tech text-[9px] text-white/30 mb-6 uppercase tracking-[0.4em]">Nivel 01</div>
+                    <h3 class="font-display text-4xl mb-4 text-white uppercase tracking-widest">CORE</h3>
+                    <div class="text-5xl font-display font-bold text-chrome mb-10">$1,499 <span class="text-xs font-tech text-white/30">MXN</span></div>
+                    <ul class="space-y-4 mb-12 text-[11px] font-tech text-white/50 uppercase tracking-widest">
+                        <li class="flex gap-3"><i data-lucide="check" class="w-4 h-4 text-neon-green"></i> Setup Panel Proveedor</li>
+                        <li class="flex gap-3"><i data-lucide="check" class="w-4 h-4 text-neon-green"></i> Sitio Web E-commerce</li>
+                        <li class="flex gap-3 text-white"><i data-lucide="zap" class="w-4 h-4 text-neon-green"></i> Dashboard Money Changer</li>
+                        <li class="flex gap-3"><i data-lucide="check" class="w-4 h-4 text-neon-green"></i> Venta Cursos/Digitales</li>
+                    </ul>
+                    <a href="https://wa.me/521XXXXXXXXXX?text=Plan%20CORE%20(Ya%20tengo%20marca)" class="block text-center border border-white/20 py-4 font-display text-2xl tracking-tighter hover:bg-white hover:text-black transition-all uppercase">Seleccionar</a>
+                </div>
+
+                <!-- NEXUS -->
+                <div class="glass-card p-12 rounded-[2rem] border-neon-green/20 bg-neon-green/5 relative overflow-hidden plan-card featured">
+                    <div class="absolute top-0 right-0 bg-neon-green text-black text-[9px] font-bold px-4 py-1 uppercase tracking-widest">POPULAR</div>
+                    <div class="font-tech text-[9px] text-neon-green mb-6 uppercase tracking-[0.4em]">Nivel 02</div>
+                    <h3 class="font-display text-4xl mb-4 text-neon-green uppercase tracking-widest">NEXUS</h3>
+                    <div class="text-5xl font-display font-bold text-chrome mb-10">$2,899 <span class="text-xs font-tech text-white/30">MXN</span></div>
+                    <ul class="space-y-4 mb-12 text-[11px] font-tech text-white/60 uppercase tracking-widest">
+                        <li class="flex gap-3 text-white"><i data-lucide="check" class="w-4 h-4 text-neon-green"></i> Todo lo de CORE</li>
+                        <li class="flex gap-3"><i data-lucide="check" class="w-4 h-4 text-neon-green"></i> Google Analytics Pro</li>
+                        <li class="flex gap-3"><i data-lucide="check" class="w-4 h-4 text-neon-green"></i> Asistente de Ventas IA</li>
+                        <li class="flex gap-3 text-white"><i data-lucide="check" class="w-4 h-4 text-neon-green"></i> Auto-Post Instagram</li>
+                    </ul>
+                    <a href="https://wa.me/521XXXXXXXXXX?text=Plan%20NEXUS%20(Ya%20tengo%20marca)" class="block text-center bg-neon-green text-black py-4 font-display text-2xl tracking-tighter hover:scale-105 transition-all uppercase font-bold">Desplegar Pro</a>
+                </div>
+
+                <!-- ULTRA -->
+                <div class="glass-card p-12 rounded-[2rem] border-white/5 plan-card">
+                    <div class="font-tech text-[9px] text-white/30 mb-6 uppercase tracking-[0.4em]">Nivel 03</div>
+                    <h3 class="font-display text-4xl mb-4 text-white uppercase tracking-widest">ULTRA</h3>
+                    <div class="text-5xl font-display font-bold text-chrome mb-10">$4,999 <span class="text-xs font-tech text-white/30">MXN</span></div>
+                    <ul class="space-y-4 mb-12 text-[11px] font-tech text-white/50 uppercase tracking-widest">
+                        <li class="flex gap-3 text-white"><i data-lucide="check" class="w-4 h-4 text-neon-green"></i> Todo lo de NEXUS</li>
+                        <li class="flex gap-3"><i data-lucide="check" class="w-4 h-4 text-neon-green"></i> Setup 5 Productos</li>
+                        <li class="flex gap-3"><i data-lucide="check" class="w-4 h-4 text-neon-green"></i> Dominio .COM Incluido</li>
+                        <li class="flex gap-3 text-white"><i data-lucide="check" class="w-4 h-4 text-neon-green"></i> Estrategia VIP</li>
+                    </ul>
+                    <a href="https://wa.me/521XXXXXXXXXX?text=Plan%20ULTRA%20(Ya%20tengo%20marca)" class="block text-center border border-white/20 py-4 font-display text-2xl tracking-tighter hover:bg-white hover:text-black transition-all uppercase">Conquistar</a>
+                </div>
+            </div>
+
+            <!-- PATH B -->
+            <div id="pathB" class="hidden grid lg:grid-cols-3 gap-8">
+                <!-- GENESIS -->
+                <div class="glass-card p-12 rounded-[2rem] border-neon-cyan/20 plan-card">
+                    <div class="font-tech text-[9px] text-neon-cyan mb-6 uppercase tracking-[0.4em]">Origen 01</div>
+                    <h3 class="font-display text-4xl mb-4 text-white uppercase tracking-widest">GENESIS</h3>
+                    <div class="text-5xl font-display font-bold text-chrome mb-10">$3,999 <span class="text-xs font-tech text-white/30">MXN</span></div>
+                    <ul class="space-y-4 mb-12 text-[11px] font-tech text-white/50 uppercase tracking-widest">
+                        <li class="flex gap-3 text-white"><i data-lucide="check" class="w-4 h-4 text-neon-cyan"></i> Naming + Logo Élite</li>
+                        <li class="flex gap-3 text-white"><i data-lucide="check" class="w-4 h-4 text-neon-cyan"></i> Identidad Visual 360</li>
+                        <li class="flex gap-3"><i data-lucide="check" class="w-4 h-4 text-neon-cyan"></i> Plan CORE Incluido</li>
+                    </ul>
+                    <a href="https://wa.me/521XXXXXXXXXX?text=Plan%20GENESIS%20(Branding)" class="block text-center border border-neon-cyan/30 py-4 font-display text-2xl tracking-tighter hover:bg-neon-cyan hover:text-black transition-all uppercase text-neon-cyan">Iniciar</a>
+                </div>
+
+                <!-- EMPIRE -->
+                <div class="glass-card p-12 rounded-[2rem] border-white/10 bg-white/5 col-span-2 plan-card featured">
+                    <div class="grid md:grid-cols-2 gap-10 items-center">
+                        <div>
+                            <div class="font-tech text-[9px] text-gray-500 mb-6 uppercase tracking-[0.4em]">Origen 02</div>
+                            <h3 class="font-display text-6xl mb-4 text-chrome uppercase tracking-widest leading-none">EMPIRE <br> DEPLOYMENT</h3>
+                            <p class="text-white/40 text-sm mb-10 font-clean uppercase tracking-widest leading-relaxed">
+                                Branding VIP total + Plan ULTRA + Setup 5 productos finales. <br> 
+                                El despliegue absoluto de tu marca en 7 días con nuestro socio global.
+                            </p>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-7xl font-display font-bold text-white mb-10">$7,999 <span class="text-xs font-tech text-white/30">MXN</span></div>
+                            <a href="https://wa.me/521XXXXXXXXXX?text=Plan%20EMPIRE%20(Branding)" class="inline-block px-16 py-6 bg-white text-black font-display text-3xl tracking-tighter hover:scale-105 transition-all uppercase font-bold">Construir Imperio</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-32 px-6 border-t border-white/5 bg-[#050505]">
+        <div class="max-w-7xl mx-auto text-center">
+            <h2 class="font-display text-[60px] md:text-[100px] chrome-text mb-12 tracking-tighter leading-none uppercase">TU IMPERIO <br> TE ESPERA</h2>
+            <p class="font-tech text-[10px] text-gray-600 uppercase tracking-[0.5em] mb-16">Desarrollado por BOTTLE CODE AGENCY &bull; 2026 OFFICIAL DEPLOYMENT</p>
+            
+            <div class="flex justify-center space-x-12 mb-20">
+                <a href="#" class="text-gray-500 hover:text-neon-green transition-colors"><i data-lucide="instagram"></i></a>
+                <a href="#" class="text-gray-500 hover:text-neon-green transition-colors"><i data-lucide="twitter"></i></a>
+                <a href="#" class="text-gray-500 hover:text-neon-green transition-colors"><i data-lucide="linkedin"></i></a>
+            </div>
+            
+            <p class="font-tech text-[8px] text-gray-800 tracking-[0.6em] uppercase">© 2026 MONEY CHANGER. POWERED BY PROPRIETARY INFRASTRUCTURE API & GLOBAL MANUFACTURING PARTNER.</p>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT -->
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+        lucide.createIcons();
+
+        // Cursor Logic
+        const cursor = document.getElementById('cursor');
+        const cursorDot = document.getElementById('cursor-dot');
+        
+        window.addEventListener('mousemove', (e) => {
+            gsap.to(cursor, { x: e.clientX - 16, y: e.clientY - 16, duration: 0.5, ease: 'power2.out' });
+            gsap.to(cursorDot, { x: e.clientX - 3, y: e.clientY - 3, duration: 0.1 });
+        });
+
+        // Preloader Logic
+        window.addEventListener('load', () => {
+            const tl = gsap.timeline();
+            tl.to('#loaderLogo', { opacity: 1, duration: 0.6 })
+              .to('#loaderBar', { width: '100%', duration: 1.5, ease: 'power4.inOut' })
+              .to('#preloader', { opacity: 0, pointerEvents: 'none', duration: 1 })
+              .to('#mainNav', { opacity: 1, y: 0, duration: 1.2, ease: 'power4.out' }, '-=0.5')
+              .add(() => initGSAP());
+        });
+
+        function initGSAP() {
+            // Hero Title Parallax
+            gsap.to('#mainTitle', {
+                scrollTrigger: {
+                    trigger: '#hero',
+                    start: 'top top',
+                    end: 'bottom top',
+                    scrub: 1
+                },
+                y: 150,
+                opacity: 0.3,
+                scale: 0.9
+            });
+
+            // Reveal Content Sections
+            gsap.utils.toArray('.reveal-content, .reveal-up').forEach((el, i) => {
+                gsap.from(el, {
+                    scrollTrigger: {
+                        trigger: el,
+                        start: 'top 90%',
+                    },
+                    y: 60,
+                    opacity: 0,
+                    duration: 1.2,
+                    ease: 'power3.out'
+                });
+            });
+
+            // Product Cards stagger
+            gsap.from('.product-card', {
+                scrollTrigger: {
+                    trigger: '#merch',
+                    start: 'top 70%',
+                },
+                y: 100,
+                opacity: 0,
+                duration: 1,
+                stagger: 0.2,
+                ease: 'back.out(1.7)'
+            });
+        }
+
+        // Path Switcher
+        function switchPath(path) {
+            const pathA = document.getElementById('pathA');
+            const pathB = document.getElementById('pathB');
+            const btnA = document.getElementById('btnA');
+            const btnB = document.getElementById('btnB');
+
+            if (path === 'A') {
+                pathA.classList.remove('hidden');
+                pathB.classList.add('hidden');
+                btnA.classList.add('active');
+                btnB.classList.remove('active');
+                btnB.classList.add('text-white/30');
+            } else {
+                pathA.classList.add('hidden');
+                pathB.classList.remove('hidden');
+                btnB.classList.add('active');
+                btnA.classList.remove('active');
+                btnA.classList.add('text-white/30');
+            }
+        }
+
+        // Hover Interactive Elements
+        document.querySelectorAll('a, button').forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                gsap.to(cursor, { scale: 1.8, borderColor: '#00FF9D', backgroundColor: 'rgba(0, 255, 157, 0.05)', duration: 0.3 });
+                gsap.to(cursorDot, { scale: 0, duration: 0.2 });
+            });
+            el.addEventListener('mouseleave', () => {
+                gsap.to(cursor, { scale: 1, borderColor: 'rgba(255, 255, 255, 0.2)', backgroundColor: 'transparent', duration: 0.3 });
+                gsap.to(cursorDot, { scale: 1, duration: 0.2 });
+            });
+        });
+    </script>
+</body>
+</html>
