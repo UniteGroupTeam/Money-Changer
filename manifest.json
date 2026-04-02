@@ -1,0 +1,17 @@
+{
+  "name": "MONEY CHANGER",
+  "short_name": "MC Empire",
+  "description": "Premium Business Operating System",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0A0A0A",
+  "theme_color": "#00FF9D",
+  "icons": [
+    {
+      "src": "https://imgur.com/8X7fE2l.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
