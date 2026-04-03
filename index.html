@@ -25,114 +25,34 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <script type="module" src="https://unpkg.com/@splinetool/viewer@1.12.73/build/spline-viewer.js"></script>
 
-    <style>
-        :root {
-            --black: #000000;
-            --dark-gray: #0A0A0A;
-            --neon-green: #00FF9D;
-            --neon-cyan: #00F0FF;
-            --chrome-gradient: linear-gradient(180deg, #FFFFFF 0%, #A1A1A1 50%, #FFFFFF 100%);
-        }
-
-        body {
-            background-color: var(--black);
-            color: white;
-            font-family: 'Syne', sans-serif;
-            overflow-x: hidden;
-            cursor: none;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        body::before {
-            content: "";
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background: url("https://grainy-gradients.vercel.app/noise.svg");
-            opacity: 0.03; pointer-events: none; z-index: 9999;
-        }
-
-        .font-display { font-family: 'Bebas Neue', cursive; }
-        .font-tech { font-family: 'DM Mono', monospace; }
-        .font-clean { font-family: 'Outfit', sans-serif; }
-
-        .chrome-text {
-            background: var(--chrome-gradient);
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.2));
-        }
-
-        .neon-glow { text-shadow: 0 0 15px var(--neon-green); }
-
-        .liquid-glass {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(45px) saturate(180%);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
-            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
-        }
-
-        #cursor { position: fixed; top: -16px; left: -16px; width: 32px; height: 32px; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 50%; pointer-events: none; z-index: 9999; }
-        #cursor-dot { position: fixed; top: -3px; left: -3px; width: 6px; height: 6px; background: var(--neon-green); border-radius: 50%; pointer-events: none; z-index: 10000; }
-
-        #hero { background-color: #000; background-image: radial-gradient(circle at 50% 50%, #151515 0%, #000 80%); }
-        spline-viewer { background: none !important; }
-        spline-viewer canvas { background: none !important; }
-
-        .ticker-track { animation: ticker 25s linear infinite; }
-        @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-
-        .toast-notification {
-            position: fixed; bottom: 40px; right: 40px; z-index: 100;
-            background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.05); padding: 10px 20px;
-            border-radius: 100px; transform: translateY(100px);
-            transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1); opacity: 0;
-        }
-        .toast-notification.active { transform: translateY(0); opacity: 1; }
-
-        #storeOverlay {
-            position: fixed; inset: 0; background: #000; z-index: 200;
-            transform: translateY(100%); transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-            overflow-y: auto;
-        }
-        #storeOverlay.active { transform: translateY(0); }
-
-        #productDetail {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 300;
-            backdrop-filter: blur(25px); transform: translateX(100%);
-            transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
-            overflow-y: auto;
-        }
-        #productDetail.active { transform: translateX(0); }
-
-        .path-btn.active {
-            background: rgba(0, 255, 157, 0.1);
-            border-color: var(--neon-green);
-            color: var(--neon-green);
-            box-shadow: 0 0 20px rgba(0, 255, 157, 0.2);
-        }
-    </style>
+    <!-- Primary Stylesheet -->
+    <link rel="stylesheet" href="style.css">
 </head>
 
-<body class="antialiased overflow-hidden">
+<body class="antialiased">
 
-    <!-- Preloader Élite -->
-    <div id="preloader" class="fixed inset-0 z-[500] bg-black flex flex-col items-center justify-center transition-opacity duration-1000">
-        <img src="https://imgur.com/dHq8INJ.png" id="loaderLogo" class="w-48 opacity-0 grayscale contrast-125 mb-10" alt="MC LOGO">
-        <div class="w-64 h-[2px] bg-white/5 rounded-full overflow-hidden">
-            <div id="loaderBar" class="w-0 h-full bg-neon-green shadow-[0_0_20px_#00FF9D]"></div>
+    <!-- Preloader -->
+    <div id="preloader" class="fixed inset-0 z-[1000] flex flex-col items-center justify-center bg-black">
+        <div class="flex flex-col items-center">
+            <img src="https://imgur.com/dHq8INJ.png" class="w-32 mb-10 opacity-0" id="loaderLogo" alt="Logo">
+            <div class="w-64 h-[2px] bg-white/10 rounded-full overflow-hidden">
+                <div class="h-full bg-neon-green w-0" id="loaderBar"></div>
+            </div>
+            <p class="font-tech text-white/20 text-[8px] uppercase tracking-[0.8em] mt-6">Establishing Empire Connection...</p>
         </div>
-        <p class="font-tech text-[8px] text-white/20 mt-4 tracking-[0.6em] uppercase">Sincronizando Ecosistema...</p>
     </div>
 
-    <!-- Interface -->
-    <div id="cursor" class="hidden md:block"></div>
-    <div id="cursor-dot" class="hidden md:block"></div>
+    <!-- UI Elements -->
+
+    <div id="fomoToast" class="toast-notification">
+        <div class="flex items-center gap-4">
+            <div class="w-2 h-2 bg-neon-green rounded-full animate-pulse shadow-[0_0_10px_#00FF9D]"></div>
+            <p id="fomoText" class="font-tech text-[10px] text-white/60 uppercase tracking-widest">SISTEMA MC ACTIVO</p>
+        </div>
+    </div>
 
     <!-- Main Navigation -->
-    <nav class="fixed top-0 w-full z-[80] px-6 py-8 opacity-0" id="mainNav">
+    <nav class="fixed top-0 w-full z-[80] px-6 py-8" id="mainNav">
         <div class="max-w-7xl mx-auto flex justify-between items-center liquid-glass px-8 py-4 rounded-full border-white/10">
             <a href="#"><img src="https://imgur.com/dHq8INJ.png" class="h-8 hover:brightness-125 transition-all" alt="Logo"></a>
             <div class="hidden md:flex gap-12 font-tech text-[10px] tracking-[0.4em] text-white/40 uppercase">
@@ -150,15 +70,15 @@
     <!-- Mobile Navigation -->
     <div class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-[400px] z-[90] md:hidden" id="mobileNav">
         <div class="liquid-glass rounded-full border-white/10 p-2 flex items-center justify-between">
-            <button onclick="scrollToSection('planes')" class="flex-1 flex flex-col items-center py-2 text-white/40">
+            <button onclick="scrollToSection('planes')" class="flex-1 flex flex-col items-center py-2 text-white/40 nav-btn">
                 <i data-lucide="layout-grid" class="w-5 h-5"></i>
                 <span class="font-tech text-[8px] uppercase mt-1">Planes</span>
             </button>
-            <button onclick="openStore()" class="flex-1 flex flex-col items-center py-2 text-white/40">
+            <button onclick="openStore()" class="flex-1 flex flex-col items-center py-2 text-white/40 nav-btn">
                 <i data-lucide="shopping-bag" class="w-5 h-5"></i>
                 <span class="font-tech text-[8px] uppercase mt-1">Tienda</span>
             </button>
-            <a href="https://wa.me/521XXXXXXXXXX" class="flex-1 flex flex-col items-center py-2 text-neon-green">
+            <a href="https://wa.me/525574123521" class="flex-1 flex flex-col items-center py-2 text-neon-green nav-btn">
                 <i data-lucide="zap" class="w-5 h-5"></i>
                 <span class="font-tech text-[8px] uppercase mt-1">Lanzar</span>
             </a>
@@ -170,12 +90,12 @@
         <div class="max-w-7xl mx-auto">
             <div class="flex justify-between items-end mb-20">
                 <h2 class="font-display text-7xl md:text-9xl chrome-text uppercase leading-none">THE SHIPS <br> <span class="text-white">COLECCIONES</span></h2>
-                <button onclick="closeStore()" class="w-16 h-16 liquid-glass rounded-full flex items-center justify-center text-white/40">
+                <button onclick="closeStore()" class="w-16 h-16 liquid-glass rounded-full flex items-center justify-center text-white/40 hover:text-white transition-all">
                     <i data-lucide="x" class="w-8 h-8"></i>
                 </button>
             </div>
             <div id="storeGrid" class="grid grid-cols-1 md:grid-cols-3 gap-10">
-                <!-- Data API -->
+                <!-- Injected via app.js -->
             </div>
         </div>
     </div>
@@ -188,33 +108,38 @@
                 <span class="font-tech text-xs tracking-widest uppercase">Volver al Catálogo</span>
             </button>
             <div id="detailContent" class="grid lg:grid-cols-2 gap-20">
-                <!-- Detailed Data -->
+                <!-- Injected via app.js -->
             </div>
         </div>
     </div>
 
     <!-- HERO SECTION -->
-    <main class="relative min-h-screen flex items-center justify-center pt-24 overflow-hidden" id="hero">
+    <main class="relative min-h-[110vh] flex items-center justify-center pt-24" id="hero">
         <div class="relative z-10 text-center px-4 max-w-7xl">
-            <div class="inline-block px-6 py-2 mb-10 rounded-full liquid-glass border-neon-green/30 text-neon-green font-tech text-[10px] tracking-[0.5em] uppercase">
-                EMPIRE OPERATING SYSTEM &bull; 2.6
+            <div class="inline-block px-8 py-3 mb-10 rounded-full liquid-glass border-neon-green/40 text-neon-green font-tech text-[11px] tracking-[0.6em] uppercase neon-glow">
+                EMPIRE OPERATING SYSTEM • 2.6
             </div>
-            <h1 class="text-[90px] md:text-[200px] font-display leading-[0.8] tracking-tighter chrome-text mb-8" id="mainTitle">
+            <h1 class="text-[90px] md:text-[230px] font-display leading-[0.75] tracking-tighter chrome-text mb-12" id="mainTitle">
                 MONEY <br class="md:hidden"> CHANGER
             </h1>
-            <p class="text-xl md:text-3xl font-light text-white/50 mb-12 tracking-wide font-clean uppercase">
-                Construimos Imperios. <span class="text-neon-green font-bold">Tú solo creas.</span>
+            <p class="text-2xl md:text-5xl font-light text-white/60 mb-16 tracking-wide font-clean uppercase">
+                Construimos Imperios. <span class="text-neon-green font-bold neon-glow">Tú solo creas.</span>
             </p>
-            <div class="flex flex-col md:flex-row gap-8 justify-center items-center mt-12">
-                <a href="#planes" class="px-16 py-7 rounded-xl bg-white text-black font-display text-3xl tracking-tighter hover:scale-105 transition-all">⚡ LANZAR MI MARCA</a>
-                <a href="javascript:void(0)" onclick="openStore()" class="px-12 py-7 rounded-xl liquid-glass border-white/10 font-display text-3xl tracking-tighter text-white hover:bg-white/5 transition-all uppercase">Ver Merch</a>
+            <div class="flex flex-col md:flex-row gap-10 justify-center items-center mt-12 pb-20">
+                <a href="#planes" class="px-20 py-8 rounded-2xl btn-primary font-display text-4xl tracking-tighter hover:scale-110 transition-all uppercase">⚡ Lanzar mi marca</a>
+                <a href="javascript:void(0)" onclick="openStore()" class="px-16 py-8 rounded-2xl btn-secondary font-display text-4xl tracking-tighter hover:bg-neon-cyan hover:text-black transition-all uppercase">Ver Merch</a>
             </div>
         </div>
+        
+        <!-- 3D Hardware Shadow -->
+        <div class="absolute inset-x-0 bottom-0 h-96 bg-gradient-to-t from-black to-transparent z-[5]"></div>
+
         <!-- 3D Robot Master -->
-        <div class="absolute inset-0 z-20 pointer-events-none mix-blend-screen opacity-90">
+        <div class="absolute inset-0 z-0 pointer-events-none spline-container grayscale brightness-125" id="hero-asset">
             <spline-viewer url="https://prod.spline.design/S3l-hk-Il1uShkyM/scene.splinecode" class="w-full h-full"></spline-viewer>
         </div>
     </main>
+
 
     <!-- TICKER -->
     <div class="py-12 border-y border-white/5 bg-black overflow-hidden relative z-20">
@@ -228,28 +153,39 @@
             <span class="mx-16 font-display text-4xl text-gray-800 tracking-widest flex items-center gap-8">
                 <div class="w-3 h-3 bg-neon-green rounded-full shadow-[0_0_10px_#00FF9D]"></div> ROPA + CURSOS + DIGITALES
             </span>
+            <!-- Duplicated for seamless loop -->
+            <span class="mx-16 font-display text-4xl text-gray-800 tracking-widest flex items-center gap-8">
+                <div class="w-3 h-3 bg-neon-green rounded-full shadow-[0_0_10px_#00FF9D]"></div> INFRAESTRUCTURA DE ÉLITE
+            </span>
+            <span class="mx-16 font-display text-4xl text-gray-800 tracking-widest flex items-center gap-8">
+                <div class="w-3 h-3 bg-neon-cyan rounded-full shadow-[0_0_10px_#00F0FF]"></div> PANEL DE PROVEEDOR GLOBAL
+            </span>
         </div>
     </div>
 
-    <!-- ARQUITECTOS SECTION -->
-    <section id="arquitectos" class="py-48 px-6 relative bg-black overflow-hidden">
+    <!-- QUIENES SOMOS SECTION -->
+    <section id="quienes-somos" class="py-48 px-6 relative bg-black overflow-hidden border-t border-white/5">
         <div class="max-w-7xl mx-auto">
             <div class="grid lg:grid-cols-2 gap-24 items-center">
                 <div class="reveal-up">
                     <div class="flex items-center gap-6 mb-10">
-                        <div class="h-[1px] w-16 bg-neon-green"></div>
-                        <span class="font-tech text-xs text-neon-green tracking-[0.5em] uppercase">La Ingeniería</span>
+                        <div class="h-[2px] w-20 bg-neon-green shadow-[0_0_20px_#00FF9D]"></div>
+                        <span class="font-tech text-sm text-neon-green tracking-[0.8em] uppercase">Misión Crítica</span>
                     </div>
-                    <h2 class="text-7xl md:text-9xl font-display chrome-text mb-12 leading-none uppercase">ARQUITECTOS <br> DEL <span class="text-neon-green neon-glow">CÓDIGO</span></h2>
-                    <p class="text-2xl text-white/40 mb-12 font-clean leading-relaxed uppercase">No somos una agencia. Somos ingenieros construyendo los sistemas que ellos usan.</p>
+                    <h2 class="text-7xl md:text-[120px] font-display chrome-text mb-12 leading-[0.85] uppercase">QUIENES <br> <span class="text-neon-green neon-glow">SOMOS</span></h2>
+                    <p class="text-2xl text-white/70 mb-12 font-clean leading-relaxed uppercase tracking-wider">
+                        En Money Changer no solo creamos sitios web, construimos infraestructuras comerciales de élite. Somos expertos en integrar e-commerce con Printful, automatizar ventas de cursos y productos digitales, y diseñar identidades visuales que dominan el mercado. 
+                        <br><br>
+                        Nuestro sistema permite que cualquier emprendedor lance su marca global en solo 7 días, con tecnología que normalmente solo está al alcance de las grandes corporaciones.
+                    </p>
                     <div class="grid grid-cols-2 gap-8">
-                        <div class="liquid-glass p-10 rounded-3xl text-center">
-                            <h4 class="text-neon-green font-display text-6xl mb-2">7 DÍAS</h4>
-                            <p class="font-tech text-[10px] uppercase tracking-widest text-white/30">Velocidad</p>
+                        <div class="liquid-glass p-10 rounded-[3rem] text-center border-white/10 group hover:border-neon-green/30 transition-all">
+                            <h4 class="text-neon-green font-display text-7xl mb-2 group-hover:scale-110 transition-transform">7 DIAS</h4>
+                            <p class="font-tech text-[10px] uppercase tracking-[0.4em] text-white/30">Velocidad de Despliegue</p>
                         </div>
-                        <div class="liquid-glass p-10 rounded-3xl text-center">
-                            <h4 class="text-neon-cyan font-display text-6xl mb-2">+50</h4>
-                            <p class="font-tech text-[10px] uppercase tracking-widest text-white/30">Marcas Activas</p>
+                        <div class="liquid-glass p-10 rounded-[3rem] text-center border-white/10 group hover:border-neon-cyan/30 transition-all">
+                            <h4 class="text-neon-cyan font-display text-7xl mb-2 group-hover:scale-110 transition-transform">+50</h4>
+                            <p class="font-tech text-[10px] uppercase tracking-[0.4em] text-white/30">Imperios Activos</p>
                         </div>
                     </div>
                 </div>
@@ -260,7 +196,7 @@
         </div>
     </section>
 
-    <!-- PLANES SECTION (RESTORATION MASTER) -->
+    <!-- PLANES SECTION -->
     <section id="planes" class="py-48 px-6 relative bg-black overflow-hidden">
         <div class="max-w-7xl mx-auto relative z-10">
             <div class="text-center mb-32 reveal-up">
@@ -277,37 +213,37 @@
             <div id="pathA" class="grid lg:grid-cols-3 gap-10">
                 <div class="liquid-glass p-14 rounded-[3.5rem] border-white/5 flex flex-col">
                     <h3 class="font-display text-6xl mb-4 text-white uppercase">CORE</h3>
-                    <div class="text-6xl font-display font-bold text-chrome mb-12">$1,499 <span class="text-sm font-tech text-white/20">MXN</span></div>
+                    <div class="text-6xl font-display font-bold chrome-text mb-12">$1,499 <span class="text-sm font-tech text-white/20">MXN</span></div>
                     <ul class="space-y-6 mb-16 text-[11px] font-tech text-white/40 uppercase tracking-widest flex-1">
                         <li class="flex gap-4"><i data-lucide="check" class="w-5 h-5 text-neon-green"></i> Setup Panel Proveedor</li>
                         <li class="flex gap-4"><i data-lucide="check" class="w-5 h-5 text-neon-green"></i> E-commerce Base</li>
                         <li class="flex gap-4 text-white font-bold"><i data-lucide="zap" class="w-5 h-5 text-neon-green"></i> Dashboard Premium</li>
                         <li class="flex gap-4"><i data-lucide="check" class="w-5 h-5 text-neon-green"></i> Venta Cursos/Digitales</li>
                     </ul>
-                    <a href="https://wa.me/521XXXXXXXXXX" class="block text-center border border-white/30 py-7 font-display text-3xl rounded-none hover:bg-white hover:text-black transition-all">INICIAR</a>
+                    <a href="https://wa.me/525574123521" class="block text-center border border-white/30 py-7 font-display text-3xl rounded-none hover:bg-white hover:text-black transition-all">INICIAR</a>
                 </div>
-                <div class="liquid-glass p-14 rounded-[4rem] border-neon-green/40 bg-neon-green/5 relative active-plan flex flex-col shadow-[0_0_50px_rgba(0,255,157,0.1)]">
+                <div class="liquid-glass p-14 rounded-[4rem] border-neon-green/40 bg-neon-green/5 relative flex flex-col shadow-[0_0_50px_rgba(0,255,157,0.1)]">
                     <div class="absolute top-0 right-14 bg-neon-green text-black text-[10px] font-bold px-6 py-2 rounded-b-xl uppercase">Sugerido</div>
                     <h3 class="font-display text-6xl mb-4 text-neon-green uppercase">NEXUS</h3>
-                    <div class="text-7xl font-display font-bold text-chrome mb-12">$2,899 <span class="text-sm font-tech text-white/20">MXN</span></div>
+                    <div class="text-7xl font-display font-bold chrome-text mb-12">$2,899 <span class="text-sm font-tech text-white/20">MXN</span></div>
                     <ul class="space-y-6 mb-16 text-[11px] font-tech text-white/70 uppercase tracking-widest flex-1">
                         <li class="flex gap-4 text-white font-bold"><i data-lucide="plus" class="w-5 h-5 text-neon-green"></i> Todo de CORE</li>
                         <li class="flex gap-4"><i data-lucide="check" class="w-5 h-5 text-neon-green"></i> Google Analytics Pro</li>
                         <li class="flex gap-4"><i data-lucide="check" class="w-5 h-5 text-neon-green"></i> Asistente de Ventas IA</li>
                         <li class="flex gap-4 text-white"><i data-lucide="instagram" class="w-5 h-5 text-neon-green"></i> Auto-Post Instagram</li>
                     </ul>
-                    <a href="https://wa.me/521XXXXXXXXXX" class="block text-center bg-neon-green text-black py-7 font-display text-3xl rounded-none font-bold hover:scale-105 transition-all">DESPLEGAR</a>
+                    <a href="https://wa.me/525574123521" class="block text-center bg-neon-green text-black py-7 font-display text-3xl rounded-none font-bold hover:scale-105 transition-all">DESPLEGAR</a>
                 </div>
                 <div class="liquid-glass p-14 rounded-[3.5rem] border-white/5 flex flex-col">
                     <h3 class="font-display text-6xl mb-4 text-white uppercase">ULTRA</h3>
-                    <div class="text-6xl font-display font-bold text-chrome mb-12">$4,999 <span class="text-sm font-tech text-white/20">MXN</span></div>
+                    <div class="text-6xl font-display font-bold chrome-text mb-12">$4,999 <span class="text-sm font-tech text-white/20">MXN</span></div>
                     <ul class="space-y-6 mb-16 text-[11px] font-tech text-white/40 uppercase tracking-widest flex-1">
                         <li class="flex gap-4"><i data-lucide="package" class="w-5 h-5 text-neon-green"></i> Setup 5 Productos Ropa</li>
                         <li class="flex gap-4"><i data-lucide="globe" class="w-5 h-5 text-neon-green"></i> Dominio Incluido</li>
                         <li class="flex gap-4 text-white"><i data-lucide="layers" class="w-5 h-5 text-neon-green"></i> E-commerce Multi-página</li>
                         <li class="flex gap-4"><i data-lucide="gift" class="w-5 h-5 text-neon-green"></i> Regalo: 1 Linktree*</li>
                     </ul>
-                    <a href="https://wa.me/521XXXXXXXXXX" class="block text-center border border-white/30 py-7 font-display text-3xl rounded-none hover:bg-white hover:text-black transition-all">CONQUISTAR</a>
+                    <a href="https://wa.me/525574123521" class="block text-center border border-white/30 py-7 font-display text-3xl rounded-none hover:bg-white hover:text-black transition-all">CONQUISTAR</a>
                 </div>
             </div>
 
@@ -315,35 +251,36 @@
             <div id="pathB" class="hidden grid lg:grid-cols-3 gap-10">
                 <div class="liquid-glass p-14 rounded-[3.5rem] border-neon-cyan/20 flex flex-col">
                     <h3 class="font-display text-6xl mb-4 text-white uppercase">GENESIS</h3>
-                    <div class="text-6xl font-display font-bold text-chrome mb-12">$3,999 <span class="text-sm font-tech text-white/20">MXN</span></div>
+                    <div class="text-6xl font-display font-bold chrome-text mb-12">$3,999 <span class="text-sm font-tech text-white/20">MXN</span></div>
                     <ul class="space-y-6 mb-16 text-[11px] font-tech text-white/40 uppercase tracking-widest flex-1">
                         <li class="flex gap-4 text-white"><i data-lucide="edit-3" class="w-5 h-5 text-neon-cyan"></i> Naming + Logo Élite</li>
                         <li class="flex gap-4 text-white"><i data-lucide="eye" class="w-5 h-5 text-neon-cyan"></i> Identidad Visual 360</li>
                         <li class="flex gap-4"><i data-lucide="zap" class="w-5 h-5 text-neon-cyan"></i> Plan CORE Incluido</li>
                     </ul>
-                    <a href="https://wa.me/521XXXXXXXXXX" class="block text-center border border-neon-cyan/30 py-7 font-display text-3xl rounded-none text-neon-cyan hover:bg-neon-cyan hover:text-black transition-all">INICIAR</a>
+                    <a href="https://wa.me/525574123521" class="block text-center border border-neon-cyan/30 py-7 font-display text-3xl rounded-none text-neon-cyan hover:bg-neon-cyan hover:text-black transition-all">INICIAR</a>
                 </div>
                 <div class="liquid-glass p-14 rounded-[3.5rem] border-white/5 flex flex-col">
                     <h3 class="font-display text-6xl mb-4 text-white uppercase">NEXUS+</h3>
-                    <div class="text-6xl font-display font-bold text-chrome mb-12">$5,499 <span class="text-sm font-tech text-white/20">MXN</span></div>
+                    <div class="text-6xl font-display font-bold chrome-text mb-12">$5,499 <span class="text-sm font-tech text-white/20">MXN</span></div>
                     <ul class="space-y-6 mb-16 text-[11px] font-tech text-white/40 uppercase tracking-widest flex-1">
                         <li class="flex gap-4 text-white"><i data-lucide="layers" class="w-5 h-5 text-neon-cyan"></i> Branding Completo</li>
                         <li class="flex gap-4 text-white"><i data-lucide="plus" class="w-5 h-5 text-neon-cyan"></i> Plan NEXUS Incluido</li>
                         <li class="flex gap-4"><i data-lucide="smartphone" class="w-5 h-5 text-neon-cyan"></i> Dashboard Money Changer</li>
                     </ul>
-                    <a href="https://wa.me/521XXXXXXXXXX" class="block text-center border border-white/30 py-7 font-display text-3xl rounded-none hover:bg-white transition-all text-white hover:text-black uppercase">Optimizar</a>
+                    <a href="https://wa.me/525574123521" class="block text-center border border-white/30 py-7 font-display text-3xl rounded-none hover:bg-white transition-all text-white hover:text-black uppercase">Optimizar</a>
                 </div>
-                <div class="liquid-glass p-14 rounded-[4rem] border-white/30 bg-white/5 flex flex-col active-plan">
+                <div class="liquid-glass p-14 rounded-[4rem] border-white/30 bg-white/5 flex flex-col active-plan relative">
                     <div class="absolute top-0 right-14 bg-white text-black text-[10px] font-bold px-6 py-2 rounded-b-xl uppercase">VIP</div>
                     <h3 class="font-display text-6xl mb-4 text-white uppercase tracking-widest">EMPIRE</h3>
-                    <div class="text-7xl font-display font-bold text-chrome mb-12">$7,999 <span class="text-sm font-tech text-white/20 text-white shadow">MXN</span></div>
+                    <div class="text-7xl font-display font-bold chrome-text mb-12">$7,999 <span class="text-sm font-tech text-white/20 text-white shadow">MXN</span></div>
                     <ul class="space-y-6 mb-16 text-[11px] font-tech text-white/70 uppercase tracking-widest flex-1">
                         <li class="flex gap-4 text-white font-bold"><i data-lucide="award" class="w-5 h-5 text-neon-green"></i> Branding VIP Total</li>
                         <li class="flex gap-4 text-white"><i data-lucide="layout" class="w-5 h-5 text-neon-green"></i> E-commerce Multi-página</li>
                         <li class="flex gap-4 text-neon-green font-bold"><i data-lucide="star" class="w-5 h-5"></i> Plan ULTRA Incluido</li>
                     </ul>
-                    <a href="https://wa.me/521XXXXXXXXXX" class="block text-center bg-white text-black py-7 font-display text-3xl rounded-none font-bold hover:scale-105 transition-all uppercase tracking-tighter">DOMINAR TODO</a>
+                    <a href="https://wa.me/525574123521" class="block text-center bg-white text-black py-7 font-display text-3xl rounded-none font-bold hover:scale-105 transition-all uppercase tracking-tighter">DOMINAR TODO</a>
                 </div>
+                <!-- Add other path B plans if needed, for now keeping consistent -->
             </div>
         </div>
     </section>
@@ -356,87 +293,8 @@
         <p class="font-tech text-[9px] text-gray-900 tracking-[0.8em] uppercase">© 2026 MONEY CHANGER® SYSTEM. POWERED BY BOTTLE CODE HQ.</p>
     </footer>
 
-    <!-- STAGING SCRIPTS MASTER -->
-    <script>
-        gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
-        
-        const SHOP_DATA = [
-            { id: 101, name: "EMPIRE HOODIE V1", price: "899.00", cat: "Outerwear", img: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=800", d: "Sudadera de alto gramaje con bordado en cromo." },
-            { id: 102, name: "CYBER TEE OVER", price: "549.00", cat: "Street", img: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800", d: "Camiseta oversized con impresión reflectante." },
-            { id: 103, name: "TRUCKER CAP MC", price: "399.00", cat: "Accessories", img: "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=800", d: "Gorra estructural con bordado 3D frontal." },
-            { id: 104, name: "LIQUID BOTTLE", price: "450.00", cat: "Gear", img: "https://images.unsplash.com/photo-1602143399827-bd959683a347?w=800", d: "Termo de acero inoxidable grabado láser." },
-            { id: 105, name: "TECH JOGGER", price: "1200.00", cat: "Pants", img: "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?w=800", d: "Pantalón cargo técnico con corte articulado." },
-            { id: 106, name: "MISSION PACK", price: "1599.00", cat: "Gear", img: "https://images.unsplash.com/photo-1553062407-98eeb94c6a62?w=800", d: "Mochila táctica impermeable." }
-        ];
+    <!-- Scripts -->
+    <script src="app.js"></script>
 
-        const cursor = document.getElementById('cursor'), cursorDot = document.getElementById('cursor-dot');
-        const xTo = gsap.quickTo(cursor, "x", {duration: 0.3}), yTo = gsap.quickTo(cursor, "y", {duration: 0.3});
-        const xdTo = gsap.quickTo(cursorDot, "x", {duration: 0.1}), ydTo = gsap.quickTo(cursorDot, "y", {duration: 0.1});
-        window.addEventListener("mousemove", e => { xTo(e.clientX - 16); yTo(e.clientY - 16); xdTo(e.clientX - 3); ydTo(e.clientY - 3); });
-
-        // Store Logic
-        function openStore() { document.getElementById('storeOverlay').classList.add('active'); renderCatalogMaster(); }
-        function closeStore() { document.getElementById('storeOverlay').classList.remove('active'); }
-
-        function renderCatalogMaster() {
-            const grid = document.getElementById('storeGrid'); grid.innerHTML = '';
-            SHOP_DATA.forEach((p, i) => {
-                const card = document.createElement('div'); card.className = 'liquid-glass p-10 rounded-[3.5rem] group cursor-pointer opacity-0 translate-y-10';
-                card.onclick = () => openProductDetail(p.id);
-                card.innerHTML = `<div class="aspect-square bg-white/5 rounded-[2.5rem] overflow-hidden mb-8"><img src="${p.img}" class="w-full h-full object-cover group-hover:scale-110 duration-1000"></div><h4 class="font-display text-4xl chrome-text uppercase">${p.name}</h4><div class="flex justify-between mt-8"><span class="text-neon-cyan font-tech text-3xl font-bold">$${p.price}</span><span class="font-tech text-white/20 text-[10px] uppercase">Detalles</span></div>`;
-                grid.appendChild(card); gsap.to(card, { opacity: 1, y: 0, delay: i * 0.1 });
-            });
-        }
-
-        function openProductDetail(id) {
-            const product = SHOP_DATA.find(p => p.id === id);
-            const content = document.getElementById('detailContent');
-            content.innerHTML = `
-                <div class="liquid-glass p-4 rounded-[4rem] overflow-hidden">
-                    <img src="${product.img}" class="w-full h-full object-cover rounded-[3.5rem]">
-                </div>
-                <div class="flex flex-col justify-center">
-                    <h2 class="font-display text-7xl md:text-9xl chrome-text uppercase leading-none mb-8">${product.name}</h2>
-                    <p class="text-2xl text-white/40 mb-12 uppercase">${product.d}</p>
-                    <div class="text-6xl font-display text-white mb-16">$${product.price}</div>
-                    <a href="https://wa.me/521XXXXXXXXXX?text=Orden:%20${product.name}" class="bg-neon-green text-black py-7 text-center font-display text-3xl rounded-2xl font-bold hover:scale-105 transition-all">ORDENAR AHORA</a>
-                </div>
-            `;
-            document.getElementById('productDetail').classList.add('active');
-        }
-        function closeProductDetail() { document.getElementById('productDetail').classList.remove('active'); }
-
-        // Core Init
-        window.addEventListener('load', () => {
-            gsap.to('#loaderBar', { width: '100%', duration: 4, onComplete: () => {
-                gsap.to('#preloader', { opacity: 0, pointerEvents: 'none' });
-                lucide.createIcons();
-                initAnimsMaster();
-            }});
-        });
-
-        function initAnimsMaster() {
-            gsap.to('#mainNav', { opacity: 1, y: 0, duration: 1.5 });
-            gsap.utils.toArray('.reveal-up').forEach(el => gsap.from(el, { scrollTrigger: { trigger: el, start: "top 95%" }, y: 50, opacity: 0, duration: 1.5 }));
-        }
-
-        function switchPathMaster(path) {
-            const btnA = document.getElementById('btnA'), btnB = document.getElementById('btnB');
-            const pA = document.getElementById('pathA'), pB = document.getElementById('pathB');
-            if(path === 'A') { btnA.classList.add('active'); btnB.classList.remove('active'); pA.classList.remove('hidden'); pB.classList.add('hidden'); }
-            else { btnB.classList.add('active'); btnA.classList.remove('active'); pB.classList.remove('hidden'); pA.classList.add('hidden'); }
-        }
-
-        function scrollToSection(id) { gsap.to(window, { duration: 1, scrollTo: `#${id}` }); }
-
-        setInterval(() => {
-            document.querySelectorAll('spline-viewer').forEach(v => {
-                if(v.shadowRoot) {
-                    const l = v.shadowRoot.querySelector('#logo');
-                    if(l) l.remove();
-                }
-            });
-        }, 1000);
-    </script>
 </body>
 </html>
