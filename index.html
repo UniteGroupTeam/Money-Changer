@@ -15,7 +15,8 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;600;800&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;600;800&family=Syne:wght@400;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;600;800&family=Syne:wght@400;700;800&display=swap" rel="stylesheet"></noscript>
 
     <!-- Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -61,6 +62,10 @@
                 <a href="#planes" class="hover:text-neon-cyan transition-colors">Inversión</a>
             </div>
             <div class="flex gap-4">
+                <a href="javascript:void(0)" onclick="openCart()" class="relative p-3 rounded-full liquid-glass border-white/10 hover:border-neon-green/40 transition-all">
+                    <i data-lucide="shopping-cart" class="w-5 h-5 text-white/70"></i>
+                    <span id="cartCount" class="absolute -top-1 -right-1 w-5 h-5 bg-neon-green text-black text-[9px] font-bold rounded-full flex items-center justify-center opacity-0 transition-opacity">0</span>
+                </a>
                 <a href="javascript:void(0)" onclick="openStore()" class="hidden sm:block px-6 py-2 rounded-full border border-white/20 text-[9px] font-bold tracking-widest hover:bg-white hover:text-black transition-all">TIENDA</a>
                 <a href="#planes" class="px-8 py-2 rounded-full bg-neon-green text-black text-[9px] font-bold tracking-widest hover:scale-110 transition-all">DEPLOYS</a>
             </div>
@@ -74,9 +79,18 @@
                 <i data-lucide="layout-grid" class="w-5 h-5"></i>
                 <span class="font-tech text-[8px] uppercase mt-1">Planes</span>
             </button>
+            <button onclick="openCart()" class="flex-1 flex flex-col items-center py-2 text-white/40 nav-btn relative">
+                <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+                <span id="cartCountMobile" class="absolute top-1 right-4 w-4 h-4 bg-neon-green text-black text-[8px] font-bold rounded-full flex items-center justify-center opacity-0 transition-opacity">0</span>
+                <span class="font-tech text-[8px] uppercase mt-1">Carrito</span>
+            </button>
             <button onclick="openStore()" class="flex-1 flex flex-col items-center py-2 text-white/40 nav-btn">
                 <i data-lucide="shopping-bag" class="w-5 h-5"></i>
                 <span class="font-tech text-[8px] uppercase mt-1">Tienda</span>
+            </button>
+            <button id="installAppBtn" class="flex-1 hidden flex-col items-center py-2 text-neon-cyan nav-btn">
+                <i data-lucide="download" class="w-5 h-5"></i>
+                <span class="font-tech text-[8px] uppercase mt-1">App</span>
             </button>
             <a href="https://wa.me/525574123521" class="flex-1 flex flex-col items-center py-2 text-neon-green nav-btn">
                 <i data-lucide="zap" class="w-5 h-5"></i>
@@ -88,6 +102,14 @@
     <!-- Store Overlay -->
     <div id="storeOverlay" class="px-6 py-24">
         <div class="max-w-7xl mx-auto">
+            <!-- Shipping Banner -->
+            <div class="mb-20 overflow-hidden border-y border-white/5 py-6 bg-neon-green/5 rounded-full">
+                <div class="ticker-track flex whitespace-nowrap gap-24 font-tech text-[12px] text-neon-green uppercase tracking-[0.5em]">
+                    <span>• Envíos a cualquier parte del mundo • Global Fulfillment Protocol Active • Shipping Worldwide •</span>
+                    <span>• Envíos a cualquier parte del mundo • Global Fulfillment Protocol Active • Shipping Worldwide •</span>
+                    <span>• Envíos a cualquier parte del mundo • Global Fulfillment Protocol Active • Shipping Worldwide •</span>
+                </div>
+            </div>
             <div class="flex justify-between items-end mb-20">
                 <h2 class="font-display text-7xl md:text-9xl chrome-text uppercase leading-none">THE SHIPS <br> <span class="text-white">COLECCIONES</span></h2>
                 <button onclick="closeStore()" class="w-16 h-16 liquid-glass rounded-full flex items-center justify-center text-white/40 hover:text-white transition-all">
@@ -109,6 +131,43 @@
             </button>
             <div id="detailContent" class="grid lg:grid-cols-2 gap-20">
                 <!-- Injected via app.js -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart Overlay -->
+    <div id="cartOverlay" class="px-6 py-24 fixed inset-0 z-[110] bg-black translate-x-full transition-transform duration-700 overflow-y-auto">
+        <div class="max-w-4xl mx-auto">
+            <div class="flex justify-between items-center mb-16">
+                <button onclick="closeCart()" class="flex items-center gap-4 text-white/40 hover:text-white transition-all group">
+                    <i data-lucide="arrow-left" class="w-8 h-8"></i>
+                    <span class="font-tech text-xs tracking-widest uppercase">Seguir Comprando</span>
+                </button>
+                <h2 class="font-display text-5xl md:text-7xl chrome-text uppercase leading-none">CARRITO</h2>
+            </div>
+            
+            <div id="cartItems" class="space-y-8 mb-20">
+                <!-- Injected via app.js -->
+            </div>
+
+            <div id="cartFooter" class="hidden">
+                <div class="liquid-glass p-10 rounded-[3rem] border-white/10 mb-12">
+                    <div class="flex justify-between items-center mb-6">
+                        <span class="font-tech text-xs text-white/30 uppercase tracking-widest">Total Inversión</span>
+                        <span id="cartTotal" class="font-display text-5xl text-white">$0 <span class="text-xs font-tech text-white/20">MXN</span></span>
+                    </div>
+                    <p class="font-tech text-[9px] text-white/20 uppercase tracking-widest mb-10 italic">Logística Global y Aduanas Procesadas en Red MC.</p>
+                    
+                    <button onclick="sendOrder()" class="w-full bg-neon-green text-black py-10 rounded-2xl font-display text-4xl font-bold hover:scale-[1.02] transition-all shadow-[0_30px_60px_-10px_rgba(0,255,157,0.3)]">
+                        TERMINAR ORDEN • WHATSAPP
+                    </button>
+                </div>
+            </div>
+
+            <div id="cartEmpty" class="text-center py-20">
+                <div class="mb-10 text-white/10 flex justify-center"><i data-lucide="shopping-cart" class="w-32 h-32"></i></div>
+                <h4 class="font-display text-4xl text-white/40 uppercase tracking-widest mb-10">Tu Carrito está Vacío</h4>
+                <button onclick="closeCart(); openStore();" class="px-12 py-5 rounded-full border border-white/20 font-tech text-[10px] uppercase text-white/60 hover:bg-white hover:text-black transition-all">Explorar Colecciones</button>
             </div>
         </div>
     </div>
@@ -136,7 +195,7 @@
 
         <!-- 3D Robot Master -->
         <div class="absolute inset-0 z-0 pointer-events-none spline-container grayscale brightness-125" id="hero-asset">
-            <spline-viewer url="https://prod.spline.design/S3l-hk-Il1uShkyM/scene.splinecode" class="w-full h-full"></spline-viewer>
+            <spline-viewer url="https://prod.spline.design/S3l-hk-Il1uShkyM/scene.splinecode" class="w-full h-full" loading="lazy"></spline-viewer>
         </div>
     </main>
 
@@ -174,7 +233,7 @@
                     </div>
                     <h2 class="text-7xl md:text-[120px] font-display chrome-text mb-12 leading-[0.85] uppercase">QUIENES <br> <span class="text-neon-green neon-glow">SOMOS</span></h2>
                     <p class="text-2xl text-white/70 mb-12 font-clean leading-relaxed uppercase tracking-wider">
-                        En Money Changer no solo creamos sitios web, construimos infraestructuras comerciales de élite. Somos expertos en integrar e-commerce con Printful, automatizar ventas de cursos y productos digitales, y diseñar identidades visuales que dominan el mercado. 
+                        En Money Changer no solo creamos sitios web, construimos infraestructuras comerciales de élite. Somos expertos en integrar e-commerce con proveedores globales, automatizar ventas de cursos y productos digitales, y diseñar identidades visuales que dominan el mercado. 
                         <br><br>
                         Nuestro sistema permite que cualquier emprendedor lance su marca global en solo 7 días, con tecnología que normalmente solo está al alcance de las grandes corporaciones.
                     </p>
@@ -190,7 +249,7 @@
                     </div>
                 </div>
                 <div class="liquid-glass p-1 rounded-[4rem] border-white/10 overflow-hidden relative h-[600px]">
-                    <spline-viewer url="https://prod.spline.design/lQrRybi3grOnRdHR/scene.splinecode" class="w-full h-full scale-110"></spline-viewer>
+                    <spline-viewer url="https://prod.spline.design/lQrRybi3grOnRdHR/scene.splinecode" class="w-full h-full scale-110" loading="lazy"></spline-viewer>
                 </div>
             </div>
         </div>
@@ -207,11 +266,9 @@
                         <button onclick="switchPathMaster('B')" id="btnB" class="path-btn px-12 py-5 rounded-full font-tech text-[11px] uppercase font-bold text-white/30 transition-all">START FROM ZERO</button>
                     </div>
                 </div>
-            </div>
-
-            <!-- Path A: Standard -->
+             <!-- Path A: Standard (Ya tengo marca) -->
             <div id="pathA" class="grid lg:grid-cols-3 gap-10">
-                <div class="liquid-glass p-14 rounded-[3.5rem] border-white/5 flex flex-col">
+                <div class="liquid-glass pricing-card p-14 rounded-[3.5rem] border-white/5 flex flex-col">
                     <h3 class="font-display text-6xl mb-4 text-white uppercase">CORE</h3>
                     <div class="text-6xl font-display font-bold chrome-text mb-12">$1,499 <span class="text-sm font-tech text-white/20">MXN</span></div>
                     <ul class="space-y-6 mb-16 text-[11px] font-tech text-white/40 uppercase tracking-widest flex-1">
@@ -222,7 +279,7 @@
                     </ul>
                     <a href="https://wa.me/525574123521" class="block text-center border border-white/30 py-7 font-display text-3xl rounded-none hover:bg-white hover:text-black transition-all">INICIAR</a>
                 </div>
-                <div class="liquid-glass p-14 rounded-[4rem] border-neon-green/40 bg-neon-green/5 relative flex flex-col shadow-[0_0_50px_rgba(0,255,157,0.1)]">
+                <div class="liquid-glass pricing-card recommended-plan p-14 rounded-[4rem] border-neon-green/40 bg-neon-green/5 relative flex flex-col">
                     <div class="absolute top-0 right-14 bg-neon-green text-black text-[10px] font-bold px-6 py-2 rounded-b-xl uppercase">Sugerido</div>
                     <h3 class="font-display text-6xl mb-4 text-neon-green uppercase">NEXUS</h3>
                     <div class="text-7xl font-display font-bold chrome-text mb-12">$2,899 <span class="text-sm font-tech text-white/20">MXN</span></div>
@@ -234,11 +291,11 @@
                     </ul>
                     <a href="https://wa.me/525574123521" class="block text-center bg-neon-green text-black py-7 font-display text-3xl rounded-none font-bold hover:scale-105 transition-all">DESPLEGAR</a>
                 </div>
-                <div class="liquid-glass p-14 rounded-[3.5rem] border-white/5 flex flex-col">
+                <div class="liquid-glass pricing-card p-14 rounded-[3.5rem] border-white/5 flex flex-col">
                     <h3 class="font-display text-6xl mb-4 text-white uppercase">ULTRA</h3>
                     <div class="text-6xl font-display font-bold chrome-text mb-12">$4,999 <span class="text-sm font-tech text-white/20">MXN</span></div>
                     <ul class="space-y-6 mb-16 text-[11px] font-tech text-white/40 uppercase tracking-widest flex-1">
-                        <li class="flex gap-4"><i data-lucide="package" class="w-5 h-5 text-neon-green"></i> Setup 5 Productos Ropa</li>
+                        <li class="flex gap-4 text-neon-green font-bold"><i data-lucide="package" class="w-5 h-5"></i> Vende lo que quieras: Físicos + Dropshipping + Ropa</li>
                         <li class="flex gap-4"><i data-lucide="globe" class="w-5 h-5 text-neon-green"></i> Dominio Incluido</li>
                         <li class="flex gap-4 text-white"><i data-lucide="layers" class="w-5 h-5 text-neon-green"></i> E-commerce Multi-página</li>
                         <li class="flex gap-4"><i data-lucide="gift" class="w-5 h-5 text-neon-green"></i> Regalo: 1 Linktree*</li>
@@ -247,40 +304,43 @@
                 </div>
             </div>
 
-            <!-- Path B: Origins -->
+            <!-- Path B: Origins (Sin marca) -->
             <div id="pathB" class="hidden grid lg:grid-cols-3 gap-10">
-                <div class="liquid-glass p-14 rounded-[3.5rem] border-neon-cyan/20 flex flex-col">
-                    <h3 class="font-display text-6xl mb-4 text-white uppercase">GENESIS</h3>
-                    <div class="text-6xl font-display font-bold chrome-text mb-12">$3,999 <span class="text-sm font-tech text-white/20">MXN</span></div>
+                <div class="liquid-glass pricing-card p-14 rounded-[3.5rem] border-neon-cyan/20 flex flex-col">
+                    <h3 class="font-display text-6xl mb-4 text-white uppercase">CORE+</h3>
+                    <div class="text-6xl font-display font-bold chrome-text mb-12">$1,999 <span class="text-sm font-tech text-white/20">MXN</span></div>
                     <ul class="space-y-6 mb-16 text-[11px] font-tech text-white/40 uppercase tracking-widest flex-1">
-                        <li class="flex gap-4 text-white"><i data-lucide="edit-3" class="w-5 h-5 text-neon-cyan"></i> Naming + Logo Élite</li>
-                        <li class="flex gap-4 text-white"><i data-lucide="eye" class="w-5 h-5 text-neon-cyan"></i> Identidad Visual 360</li>
-                        <li class="flex gap-4"><i data-lucide="zap" class="w-5 h-5 text-neon-cyan"></i> Plan CORE Incluido</li>
+                        <li class="flex gap-4 text-neon-cyan font-bold"><i data-lucide="plus" class="w-5 h-5"></i> Branding Incluido (Logo)</li>
+                        <li class="flex gap-4"><i data-lucide="check" class="w-5 h-5 text-neon-green"></i> Setup Panel Proveedor</li>
+                        <li class="flex gap-4"><i data-lucide="check" class="w-5 h-5 text-neon-green"></i> E-commerce Base</li>
+                        <li class="flex gap-4 text-white font-bold"><i data-lucide="zap" class="w-5 h-5 text-neon-green"></i> Dashboard Premium</li>
                     </ul>
                     <a href="https://wa.me/525574123521" class="block text-center border border-neon-cyan/30 py-7 font-display text-3xl rounded-none text-neon-cyan hover:bg-neon-cyan hover:text-black transition-all">INICIAR</a>
                 </div>
-                <div class="liquid-glass p-14 rounded-[3.5rem] border-white/5 flex flex-col">
+                <div class="liquid-glass pricing-card recommended-plan p-14 rounded-[3.5rem] border-white/5 flex flex-col">
                     <h3 class="font-display text-6xl mb-4 text-white uppercase">NEXUS+</h3>
-                    <div class="text-6xl font-display font-bold chrome-text mb-12">$5,499 <span class="text-sm font-tech text-white/20">MXN</span></div>
+                    <div class="text-6xl font-display font-bold chrome-text mb-12">$3,199 <span class="text-sm font-tech text-white/20">MXN</span></div>
                     <ul class="space-y-6 mb-16 text-[11px] font-tech text-white/40 uppercase tracking-widest flex-1">
-                        <li class="flex gap-4 text-white"><i data-lucide="layers" class="w-5 h-5 text-neon-cyan"></i> Branding Completo</li>
-                        <li class="flex gap-4 text-white"><i data-lucide="plus" class="w-5 h-5 text-neon-cyan"></i> Plan NEXUS Incluido</li>
-                        <li class="flex gap-4"><i data-lucide="smartphone" class="w-5 h-5 text-neon-cyan"></i> Dashboard Money Changer</li>
+                        <li class="flex gap-4 text-neon-cyan font-bold"><i data-lucide="layers" class="w-5 h-5"></i> Branding Pro (360)</li>
+                        <li class="flex gap-4 text-white font-bold"><i data-lucide="plus" class="w-5 h-5 text-neon-green"></i> Todo de CORE</li>
+                        <li class="flex gap-4"><i data-lucide="check" class="w-5 h-5 text-neon-green"></i> Google Analytics Pro</li>
+                        <li class="flex gap-4 text-white"><i data-lucide="instagram" class="w-5 h-5 text-neon-green"></i> Auto-Post Instagram</li>
                     </ul>
                     <a href="https://wa.me/525574123521" class="block text-center border border-white/30 py-7 font-display text-3xl rounded-none hover:bg-white transition-all text-white hover:text-black uppercase">Optimizar</a>
                 </div>
-                <div class="liquid-glass p-14 rounded-[4rem] border-white/30 bg-white/5 flex flex-col active-plan relative">
+                <div class="liquid-glass pricing-card p-14 rounded-[4rem] border-white/30 bg-white/5 flex flex-col active-plan relative shadow-[0_0_50px_rgba(255,255,255,0.1)]">
                     <div class="absolute top-0 right-14 bg-white text-black text-[10px] font-bold px-6 py-2 rounded-b-xl uppercase">VIP</div>
                     <h3 class="font-display text-6xl mb-4 text-white uppercase tracking-widest">EMPIRE</h3>
-                    <div class="text-7xl font-display font-bold chrome-text mb-12">$7,999 <span class="text-sm font-tech text-white/20 text-white shadow">MXN</span></div>
+                    <div class="text-7xl font-display font-bold chrome-text mb-12">$5,399 <span class="text-sm font-tech text-white/20 text-white shadow">MXN</span></div>
                     <ul class="space-y-6 mb-16 text-[11px] font-tech text-white/70 uppercase tracking-widest flex-1">
-                        <li class="flex gap-4 text-white font-bold"><i data-lucide="award" class="w-5 h-5 text-neon-green"></i> Branding VIP Total</li>
+                        <li class="flex gap-4 text-neon-cyan font-bold"><i data-lucide="award" class="w-5 h-5"></i> Branding VIP Total</li>
+                        <li class="flex gap-4 text-white font-bold"><i data-lucide="zap" class="w-5 h-5 text-neon-green"></i> Vende lo que quieras: Físicos + Dropshipping + Ropa</li>
                         <li class="flex gap-4 text-white"><i data-lucide="layout" class="w-5 h-5 text-neon-green"></i> E-commerce Multi-página</li>
                         <li class="flex gap-4 text-neon-green font-bold"><i data-lucide="star" class="w-5 h-5"></i> Plan ULTRA Incluido</li>
+                        <li class="flex gap-4"><i data-lucide="globe" class="w-5 h-5 text-neon-green"></i> Dominio Incluido</li>
                     </ul>
                     <a href="https://wa.me/525574123521" class="block text-center bg-white text-black py-7 font-display text-3xl rounded-none font-bold hover:scale-105 transition-all uppercase tracking-tighter">DOMINAR TODO</a>
                 </div>
-                <!-- Add other path B plans if needed, for now keeping consistent -->
             </div>
         </div>
     </section>

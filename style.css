@@ -15,6 +15,8 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
 }
 
 body {
@@ -77,6 +79,49 @@ body::before {
     border-color: rgba(255, 255, 255, 0.15);
 }
 
+.pricing-card {
+    background: rgba(15, 15, 15, 0.9) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    backdrop-filter: blur(40px) saturate(200%) !important;
+    box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 1) !important;
+    transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+    will-change: transform, opacity;
+    transform: translateZ(0);
+}
+
+.pricing-card:hover {
+    background: rgba(25, 25, 25, 0.95) !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+    transform: translateY(-10px) scale(1.02);
+}
+
+.pricing-card.active-plan {
+    border-color: var(--neon-green) !important;
+    background: rgba(0, 255, 157, 0.05) !important;
+}
+
+.recommended-plan {
+    border-color: rgba(0, 255, 157, 0.4) !important;
+    box-shadow: 0 0 80px rgba(0, 255, 157, 0.15), 0 40px 80px -20px rgba(0, 0, 0, 1) !important;
+    position: relative;
+    z-index: 5;
+}
+
+.recommended-plan::after {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    background: linear-gradient(45deg, transparent, rgba(0, 255, 157, 0.2), transparent);
+    z-index: -1;
+    animation: aura-pulse 3s infinite alternate;
+}
+
+@keyframes aura-pulse {
+    from { opacity: 0.3; transform: scale(1); }
+    to { opacity: 0.7; transform: scale(1.01); }
+}
+
 /* Preloader */
 #preloader {
     background-color: var(--black);
@@ -107,9 +152,14 @@ body::before {
     background: #000000 !important;
     mask-image: radial-gradient(circle, black 40%, transparent 100%);
     -webkit-mask-image: radial-gradient(circle, black 40%, transparent 100%);
+    will-change: transform;
+    transform: translateZ(0);
 }
 
-.ticker-track { animation: ticker 25s linear infinite; }
+.ticker-track { 
+    animation: ticker 35s linear infinite; 
+    will-change: transform;
+}
 @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
 /* Overlays */
@@ -227,6 +277,21 @@ spline-viewer {
     box-shadow: 0 0 30px rgba(0,255,157,0.2);
 }
 .toast-notification.active { transform: translateY(0); opacity: 1; }
+
+@media (max-width: 768px) {
+    .toast-notification {
+        top: 20px;
+        bottom: auto;
+        right: 20px;
+        left: 20px;
+        max-width: calc(100% - 40px);
+        transform: translateY(-100px);
+        padding: 10px 20px;
+        display: flex;
+        justify-content: center;
+    }
+    .toast-notification.active { transform: translateY(0); }
+}
 
 
 

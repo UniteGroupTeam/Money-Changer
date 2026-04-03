@@ -60,27 +60,34 @@ async function loadProviderCatalog() {
     let products = [];
     
     try {
-        // Attempting Live Handshake via Proxy
         const proxyUrl = `https://corsproxy.io/?url=${encodeURIComponent(PROVIDER_API + '/store/products')}`;
         const response = await fetch(proxyUrl, { headers: { 'Authorization': `Bearer ${_0x5f2}` } });
         const data = await response.json();
-        products = (data.result || data.data).map(p => ({
-            id: p.id,
-            name: p.name,
-            price: "LIVE",
-            img: p.thumbnail_url,
-            d: "Producto sincronizado directamente desde la Red Global vía Neural Link v2.0."
-        }));
-        console.log("Live Sync Established");
+        
+        const apiList = data.result || data.data;
+        if (apiList && Array.isArray(apiList)) {
+            products = apiList.map(p => ({
+                id: p.id,
+                name: p.name,
+                price: "LIVE",
+                img: p.thumbnail_url,
+                d: "Producto sincronizado directamente desde la Red Global vía Neural Link v2.0.",
+                material: "Premium Fiber protocol",
+                fit: "Neural Fit v1.0"
+            }));
+            console.log("Live Sync Established");
+        } else {
+            throw new Error('Invalid Data Structure');
+        }
     } catch (e) {
-        // SILENT FALLBACK: No error screens, just high-end local data.
-        console.warn("CORS/Security Blocked Live Sync. Activating Neural Cache.");
+        console.warn("Sync Blocked / Cache Active.");
         products = PROVIDER_SYNC_INDEX;
     }
 
     // Render Logic
     setTimeout(() => {
         grid.innerHTML = '';
+        if(!products || products.length === 0) products = PROVIDER_SYNC_INDEX;
         products.forEach((p, idx) => {
             const card = document.createElement('div');
             card.className = 'liquid-glass p-12 rounded-[4.5rem] group cursor-pointer opacity-0 translate-y-20 transition-all hover:scale-[1.03] hover:border-neon-cyan/30';
