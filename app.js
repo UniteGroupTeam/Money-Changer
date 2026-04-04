@@ -40,7 +40,7 @@ const PROVIDER_SYNC_INDEX = [
 ];
 
 const _0x5f2 = "PIbaSIJVhpf38gDIWgsxTtuB5N859NWmFpYRpQLG"; 
-const PROVIDER_API = "https://api.cloud-fulfillment.host"; // Generic endpoint naming
+const PROVIDER_API = "https://api.printful.com"; // Real infrastructure sync
 
 // Hybrid Sync Engine: Attempts LIVE, fails SILENTLY to Cache.
 async function loadProviderCatalog() {
@@ -53,7 +53,7 @@ async function loadProviderCatalog() {
                 <div class="absolute inset-0 border-4 border-neon-cyan/10 rounded-full scale-110"></div>
                 <div class="absolute inset-0 border-[4px] border-neon-cyan border-t-transparent rounded-full animate-spin shadow-[0_0_40px_rgba(0,240,255,0.3)]"></div>
             </div>
-            <p class="font-tech text-[16px] uppercase tracking-[1.5em] text-neon-cyan neon-glow animate-pulse">Establishing Deep Sync...</p>
+            <p class="font-tech text-[16px] uppercase tracking-[1.5em] text-neon-cyan neon-glow animate-pulse">Syncing with Global Hub...</p>
         </div>
     `;
 
