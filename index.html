@@ -110,11 +110,21 @@
                     <span>• Envíos a cualquier parte del mundo • Global Fulfillment Protocol Active • Shipping Worldwide •</span>
                 </div>
             </div>
-            <div class="flex justify-between items-end mb-20">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-10 mb-16">
                 <h2 class="font-display text-7xl md:text-9xl chrome-text uppercase leading-none">THE SHIPS <br> <span class="text-white">COLECCIONES</span></h2>
-                <button onclick="closeStore()" class="w-16 h-16 liquid-glass rounded-full flex items-center justify-center text-white/40 hover:text-white transition-all">
-                    <i data-lucide="x" class="w-8 h-8"></i>
-                </button>
+                <div class="flex items-center gap-6">
+                    <div class="relative group">
+                        <i data-lucide="search" class="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20 group-focus-within:text-neon-green transition-colors"></i>
+                        <input type="text" id="storeSearch" placeholder="BUSCAR PRODUCTO..." oninput="filterCatalog(this.value)" class="w-full md:w-[350px] bg-white/5 border border-white/10 rounded-full py-4 pl-16 pr-8 font-tech text-[10px] tracking-[0.3em] uppercase text-white focus:outline-none focus:border-neon-green/40 transition-all">
+                    </div>
+                    <button onclick="openCart()" class="w-16 h-16 liquid-glass rounded-full flex items-center justify-center text-neon-green hover:bg-neon-green hover:text-black transition-all group relative">
+                        <i data-lucide="shopping-cart" class="w-7 h-7"></i>
+                        <span id="storeCartCount" class="absolute -top-1 -right-1 w-5 h-5 bg-white text-black text-[9px] font-bold rounded-full flex items-center justify-center">0</span>
+                    </button>
+                    <button onclick="closeStore()" class="w-16 h-16 liquid-glass rounded-full flex items-center justify-center text-white/40 hover:text-white transition-all">
+                        <i data-lucide="x" class="w-8 h-8"></i>
+                    </button>
+                </div>
             </div>
             <div id="storeGrid" class="grid grid-cols-1 md:grid-cols-3 gap-10">
                 <!-- Injected via app.js -->

@@ -63,35 +63,41 @@ async function loadProviderCatalog() {
         const proxyUrl = `https://corsproxy.io/?url=${encodeURIComponent(PROVIDER_API + '/store/products')}`;
         const response = await fetch(proxyUrl, { headers: { 'Authorization': `Bearer ${_0x5f2}` } });
         const data = await response.json();
+        const apiList = data.result || data.data || data.products || data.items;
         
-        const apiList = data.result || data.data;
         if (apiList && Array.isArray(apiList)) {
             products = apiList.map(p => ({
                 id: p.id,
                 name: p.name,
-                price: "LIVE",
-                img: p.thumbnail_url,
+                price: p.price || "CONSULTAR",
+                img: p.thumbnail_url || p.image_url || p.img,
                 d: "Producto sincronizado directamente desde la Red Global vía Neural Link v2.0.",
                 material: "Premium Fiber protocol",
                 fit: "Neural Fit v1.0"
             }));
             console.log("Live Sync Established");
         } else {
-            throw new Error('Invalid Data Structure');
+            throw new Error('Data Empty');
         }
     } catch (e) {
-        console.warn("Sync Blocked / Cache Active.");
+        console.warn("Manual override: Sync Blocked / Cache Active.");
         products = PROVIDER_SYNC_INDEX;
     }
 
-    // Render Logic
+    window.masterCatalog = products;
+    renderGrid(products);
+}
+
+function renderGrid(list) {
+    const grid = document.getElementById('storeGrid');
+    if(!grid) return;
+    grid.innerHTML = '';
+    
     setTimeout(() => {
-        grid.innerHTML = '';
-        if(!products || products.length === 0) products = PROVIDER_SYNC_INDEX;
-        products.forEach((p, idx) => {
+        list.forEach((p, idx) => {
             const card = document.createElement('div');
             card.className = 'liquid-glass p-12 rounded-[4.5rem] group cursor-pointer opacity-0 translate-y-20 transition-all hover:scale-[1.03] hover:border-neon-cyan/30';
-            card.onclick = () => openProductDetail(p.id, products);
+            card.onclick = () => openProductDetail(p.id, list);
             card.innerHTML = `
                 <div class="aspect-square bg-white/5 rounded-[4rem] overflow-hidden mb-12 relative shadow-2xl">
                     <img src="${p.img}" class="w-full h-full object-cover group-hover:scale-125 duration-1000 transition-transform">
@@ -104,16 +110,22 @@ async function loadProviderCatalog() {
                 <div class="flex justify-between items-center bg-black/40 p-10 rounded-[2.5rem] border border-white/5 group-hover:border-neon-green/20">
                     <div class="flex flex-col">
                         <span class="font-tech text-[10px] text-white/20 uppercase">Network Rate</span>
-                        <span class="text-neon-cyan font-tech text-4xl font-bold tracking-tighter">${p.price === "LIVE" ? "V2.6 LIVE" : "$"+p.price}</span>
+                        <span class="text-neon-cyan font-tech text-4xl font-bold tracking-tighter">$${p.price}</span>
                     </div>
                     <div class="px-8 py-3 rounded-full bg-neon-green text-black font-display text-xl uppercase tracking-tighter hover:scale-110 transition-all shadow-[0_0_20px_rgba(0,255,157,0.3)]">Deploy</div>
                 </div>
             `;
             grid.appendChild(card);
-            gsap.to(card, { opacity: 1, y: 0, delay: idx * 0.1, duration: 1.2, ease: "power4.out" });
+            gsap.to(card, { opacity: 1, y: 0, delay: idx * 0.05, duration: 0.8, ease: "power3.out" });
         });
         lucide.createIcons();
-    }, 1000);
+    }, 300);
+}
+
+function filterCatalog(query) {
+    const q = query.toLowerCase();
+    const filtered = window.masterCatalog.filter(p => p.name.toLowerCase().includes(q));
+    renderGrid(filtered);
 }
 
 function openStore() {
@@ -184,15 +196,18 @@ async function openProductDetail(id, currentList) {
                     </div>
                 </div>
 
-                <button id="addToCartBtn" 
-                   data-name="${info.name}" 
-                   data-id="${info.id}"
-                   data-price="${info.price}"
-                   data-img="${info.img}"
-                   onclick="addToCart('${info.id}', '${info.name}', '${info.price}', '${info.img}')"
-                   class="w-full bg-white text-black py-8 md:py-10 text-center font-display text-4xl md:text-5xl rounded-[2rem] md:rounded-[2.5rem] font-bold hover:bg-neon-green transition-all shadow-[0_40px_80px_-20px_rgba(255,255,255,0.1)]">
-                   Añadir al Carrito
-                </button>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <button id="addToCartBtn" 
+                        onclick="addToCart('${info.id}', '${info.name}', '${info.price}', '${info.img}')"
+                        class="bg-white/10 text-white py-8 md:py-10 text-center font-display text-2xl md:text-3xl rounded-[2rem] md:rounded-[2.5rem] font-bold hover:bg-white/20 transition-all border border-white/10">
+                        + CARRITO
+                    </button>
+                    <button id="buyNowBtn" 
+                        onclick="buyNow('${info.id}', '${info.name}', '${info.price}', '${info.img}')"
+                        class="bg-neon-green text-black py-8 md:py-10 text-center font-display text-2xl md:text-3xl rounded-[2rem] md:rounded-[2.5rem] font-bold hover:scale-[1.05] transition-all shadow-[0_0_30px_rgba(0,255,157,0.3)]">
+                        COMPRAR AHORA
+                    </button>
+                </div>
             </div>
         `;
     }, 600);
@@ -255,16 +270,25 @@ function saveCart() {
 }
 
 function updateCartCounters() {
-    const counts = document.querySelectorAll('#cartCount, #cartCountMobile');
+    const counts = document.querySelectorAll('#cartCount, #cartCountMobile, #storeCartCount');
     const totalQty = cart.reduce((acc, current) => acc + current.qty, 0);
     
     counts.forEach(c => {
         if(c) {
             c.innerText = totalQty;
             c.style.opacity = totalQty > 0 ? 1 : 0;
+            if(c.id === 'storeCartCount') c.style.opacity = 1; // Always visible in store
         }
     });
 }
+
+function buyNow(id, name, price, img) {
+    addToCart(id, name, price, img);
+    sendOrder();
+}
+
+window.buyNow = buyNow;
+window.filterCatalog = filterCatalog;
 
 function renderCart() {
     const container = document.getElementById('cartItems');
